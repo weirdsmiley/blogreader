@@ -1,0 +1,138 @@
+# List of RSS/Atom feeds to track.
+[[feeds]]
+name = "Eli Bendersky's website"
+url  = "https://eli.thegreenplace.net/feeds/all.atom.xml"
+
+[[feeds]]
+name = "Hacker News"
+url  = "https://news.ycombinator.com/rss"
+
+[[feeds]]
+name = "Julia Evans"
+url  = "https://jvns.ca/atom.xml"
+
+[[feeds]]
+name = "LLVM Blogs"
+url  = "https://blog.llvm.org/index.xml"
+
+[[feeds]]
+name = "Nikita Popov"
+url  = "https://www.npopov.com/rss.xml"
+
+[[feeds]]
+name = "Ralf Jung"
+url  = "https://www.ralfj.de/blog/feed.xml"
+
+[[feeds]]
+name = "Microsoft Security"
+url  = "https://msrc-blog.microsoft.com/blog/feed.xml"
+
+[[feeds]]
+name = "Typesanitizer"
+url  = "https://typesanitizer.com/blog/rss.xml"
+
+[[feeds]]
+name = "Gankra's blogs"
+url  = "https://gankra.github.io/blah/rss.xml"
+
+[[feeds]]
+name = "ferd.ca"
+url  = "https://ferd.ca/feed.rss"
+
+[[feeds]]
+name = "thephd.dev"
+url  = "https://thephd.dev/feed.xml"
+
+[[feeds]]
+name = "foonathan.net"
+url  = "https://www.foonathan.net/post/feed.xml"
+
+[[feeds]]
+name = "rakyll.org"
+url  = "https://rakyll.org/index.xml"
+
+[[feeds]]
+name = "michael.stapelberg.ch"
+url  = "https://michael.stapelberg.ch/feed.xml"
+
+[[feeds]]
+name = "begriffs.com"
+url  = "https://begriffs.com/atom.xml"
+
+[[feeds]]
+name = "vickieli.dev"
+url  = "https://vickieli.dev/feed.xml"
+
+[[feeds]]
+name = "maskray.me"
+url  = "https://maskray.me/blog/atom.xml"
+
+[[feeds]]
+name = "pavpanchekha.com"
+url  = "https://pavpanchekha.com/rss.xml"
+
+[[feeds]]
+name = "manishearth.github.io"
+url  = "https://manishearth.github.io/atom.xml"
+
+[[feeds]]
+name = "jrsinclair.com"
+url  = "https://jrsinclair.com/index.rss"
+
+[[feeds]]
+name = "lexi-lambda.github.io"
+url  = "https://lexi-lambda.github.io/feeds/all.rss.xml"
+
+[[feeds]]
+name = "marcin.juszkiewicz.com.pl"
+url  = "https://marcin.juszkiewicz.com.pl/feed/"
+
+[[feeds]]
+name = "shafik.github.io"
+url  = "https://shafik.github.io/feed.xml"
+
+[[feeds]]
+name = "fasterthanli.me"
+url  = "https://fasterthanli.me/index.xml"
+
+[[feeds]]
+name = "herrdreyer.wordpress.com"
+url  = "https://herrdreyer.wordpress.com/feed/"
+
+[[feeds]]
+name = "josefbacik.github.io"
+url  = "https://josefbacik.github.io/feed.xml"
+
+[[feeds]]
+name = "blog.yossarian.net"
+url  = "https://blog.yossarian.net/feed.xml"
+
+[[feeds]]
+name = "herbsutter.com"
+url  = "https://herbsutter.com/feed/"
+
+[[feeds]]
+name = "bartoszmilewski.com"
+url  = "https://bartoszmilewski.com/feed/"
+
+[[feeds]]
+name = "John Regehr"
+url  = "https://blog.regehr.org/feed"
+
+[[feeds]]
+name = "Rust Blogs"
+url  = "https://blog.rust-lang.org/inside-rust/feed.xml"
+
+[[feeds]]
+name = "LWN"
+url  = "https://lwn.net/headlines/rss"
+
+[[feeds]]
+name = "Jules Jacob"
+url  = "https://julesjacobs.com/feed.xml"
+
+# List of websites to track manually for changes.
+# These might have feeds, but are good examples for manual tracking.
+[[manual]]
+name = "Hacker News"
+url  = "https://news.ycombinator.com"

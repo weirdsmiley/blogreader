@@ -1,0 +1,8 @@
+/bookmarks.txt
+/cache.json
+/*.py
+/config.toml
+/*.log
+/target
+/feeds.toml
+/*.bak
