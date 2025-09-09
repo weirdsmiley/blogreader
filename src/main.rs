@@ -1,16 +1,17 @@
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
+use feed_rs::parser as feed_parser;
 use ratatui::{
+    Frame, Terminal,
     backend::{Backend, CrosstermBackend},
     layout::{Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
-    widgets::{Block, Borders, List, ListItem, ListState},
-    Frame, Terminal,
+    widgets::{Block, Borders, List, ListItem, ListState, Paragraph},
 };
-use serde::{Deserialize};
+use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::{
     collections::HashMap,
@@ -20,7 +21,6 @@ use std::{
     time::{Duration, Instant},
 };
 use tokio::sync::mpsc;
-use feed_rs::parser as feed_parser;
 
 #[derive(Debug, Deserialize, Clone)]
 struct Feed {
@@ -72,9 +72,15 @@ async fn fetch_feed(feed: Feed, tx: mpsc::Sender<Update>) {
     match feed_parser::parse(&bytes[..]) {
         Ok(parsed_feed) => {
             for entry in parsed_feed.entries.iter().take(5) {
-                let title = entry.title.clone().map_or_else(|| "No Title".to_string(), |t| t.content);
+                let title = entry
+                    .title
+                    .clone()
+                    .map_or_else(|| "No Title".to_string(), |t| t.content);
                 let link = entry.links.first().map_or("", |l| &l.href).to_string();
-                if let Err(e) = tx.send(Update::NewFeedItem(feed.name.clone(), title, link)).await {
+                if let Err(e) = tx
+                    .send(Update::NewFeedItem(feed.name.clone(), title, link))
+                    .await
+                {
                     eprintln!("Failed to send feed update: {}", e);
                     break;
                 }
@@ -87,17 +93,32 @@ async fn fetch_feed(feed: Feed, tx: mpsc::Sender<Update>) {
     }
 }
 
-async fn check_manual_site(site: Manual, tx: mpsc::Sender<Update>, cache: Cache, cache_path: String) {
+async fn check_manual_site(
+    site: Manual,
+    tx: mpsc::Sender<Update>,
+    cache: Cache,
+    cache_path: String,
+) {
     let content = match reqwest::get(&site.url).await {
         Ok(res) => match res.text().await {
             Ok(text) => text,
             Err(e) => {
-                let _ = tx.send(Update::Error(format!("[ERROR] reading content for {}: {}", site.name, e))).await;
+                let _ = tx
+                    .send(Update::Error(format!(
+                        "[ERROR] reading content for {}: {}",
+                        site.name, e
+                    )))
+                    .await;
                 return;
             }
         },
         Err(e) => {
-            let _ = tx.send(Update::Error(format!("Error fetching {}: {}", site.name, e))).await;
+            let _ = tx
+                .send(Update::Error(format!(
+                    "Error fetching {}: {}",
+                    site.name, e
+                )))
+                .await;
             return;
         }
     };
@@ -113,7 +134,10 @@ async fn check_manual_site(site: Manual, tx: mpsc::Sender<Update>, cache: Cache,
 
     if old_hash.as_deref() != Some(&new_hash) {
         let update_message = format!("New content detected on {}", site.name);
-        if let Err(e) = tx.send(Update::ManualUpdate(update_message, site.url.clone())).await {
+        if let Err(e) = tx
+            .send(Update::ManualUpdate(update_message, site.url.clone()))
+            .await
+        {
             eprintln!("Failed to send manual update: {}", e);
         }
 
@@ -126,12 +150,14 @@ async fn check_manual_site(site: Manual, tx: mpsc::Sender<Update>, cache: Cache,
             let cache_guard = cache.lock().unwrap();
             serde_json::to_string_pretty(&*cache_guard).unwrap()
         };
-        
+
         if let Err(e) = tokio::fs::write(&cache_path, cache_content).await {
             eprintln!("Failed to write to cache file: {}", e);
         }
     } else {
-         let _ = tx.send(Update::Info(format!("No changes for {}", site.name))).await;
+        let _ = tx
+            .send(Update::Info(format!("No changes for {}", site.name)))
+            .await;
     }
 }
 
@@ -146,7 +172,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let res = run_app(&mut terminal).await;
 
     disable_raw_mode()?;
-    execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
+    execute!(
+        terminal.backend_mut(),
+        LeaveAlternateScreen,
+        DisableMouseCapture
+    )?;
     terminal.show_cursor()?;
 
     if let Err(err) = res {
@@ -156,98 +186,245 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+// NEW: Enum to control input mode
+enum InputMode {
+    Normal,
+    Search,
+}
+
+// NEW: Struct to hold the application's state
+struct App {
+    /// All updates received, the single source of truth.
+    all_updates: Vec<(String, Option<String>, bool)>,
+    /// Messages for the info panel.
+    info_messages: Vec<String>,
+    /// State for the main list.
+    list_state: ListState,
+    /// Current value of the search input.
+    input: String,
+    /// Current input mode.
+    input_mode: InputMode,
+}
+
+impl App {
+    // NEW: Constructor for the app state
+    fn new(initial_updates: Vec<(String, Option<String>, bool)>) -> App {
+        App {
+            all_updates: initial_updates,
+            info_messages: Vec::new(),
+            list_state: ListState::default(),
+            input: String::new(),
+            input_mode: InputMode::Normal,
+        }
+    }
+
+    // NEW: Method for list navigation
+    fn next(&mut self, item_count: usize) {
+        if item_count == 0 {
+            self.list_state.select(None);
+            return;
+        }
+        let i = match self.list_state.selected() {
+            Some(i) => {
+                if i >= item_count - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.list_state.select(Some(i));
+    }
+
+    // NEW: Method for list navigation
+    fn previous(&mut self, item_count: usize) {
+        if item_count == 0 {
+            self.list_state.select(None);
+            return;
+        }
+        let i = match self.list_state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    item_count - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.list_state.select(Some(i));
+    }
+}
+
 async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
     // Each item is a tuple: (display_text, link, is_new)
-    let mut main_updates: Vec<(String, Option<String>, bool)> = vec![
+    let initial_updates: Vec<(String, Option<String>, bool)> = vec![
         ("Press 'u' to check for updates.".to_string(), None, false),
-        ("Press 'o' or Enter to open selected link.".to_string(), None, false),
+        (
+            "Press 'o' or Enter to open selected link.".to_string(),
+            None,
+            false,
+        ),
+        ("Press '/' to search/filter.".to_string(), None, false),
         ("Use j/k to scroll.".to_string(), None, false),
         ("Press 'q' to quit.".to_string(), None, false),
     ];
-    let mut info_messages: Vec<String> = Vec::new();
 
-    let mut list_state = ListState::default();
-    list_state.select(Some(0));
+    let mut app = App::new(initial_updates);
+    app.list_state.select(Some(0));
 
     let (tx, mut rx) = mpsc::channel(100);
 
     let config_path = dirs::config_dir().unwrap().join("br/config.toml");
 
     let config: Config = match tokio::fs::read_to_string(&config_path).await {
-        Ok(config_str) => toml::from_str(&config_str).unwrap_or(Config { feeds: None, manual: None }),
+        Ok(config_str) => toml::from_str(&config_str).unwrap_or(Config {
+            feeds: None,
+            manual: None,
+        }),
         Err(_) => {
-            main_updates.push(("[ERROR] config.toml not found.".to_string(), None, false));
-            Config { feeds: None, manual: None }
+            app.all_updates
+                .push(("[ERROR] config.toml not found.".to_string(), None, false));
+            Config {
+                feeds: None,
+                manual: None,
+            }
         }
     };
-    
-    let cache_path = dirs::data_dir().unwrap().join("br/cache.json").to_string_lossy().to_string();
-    let cache_content = tokio::fs::read_to_string(&cache_path).await.unwrap_or_else(|_| "{}".to_string());
-    let cache_map: HashMap<String, String> = serde_json::from_str(&cache_content).unwrap_or_default();
+
+    let cache_path = dirs::data_dir()
+        .unwrap()
+        .join("br/cache.json")
+        .to_string_lossy()
+        .to_string();
+    let cache_content = tokio::fs::read_to_string(&cache_path)
+        .await
+        .unwrap_or_else(|_| "{}".to_string());
+    let cache_map: HashMap<String, String> =
+        serde_json::from_str(&cache_content).unwrap_or_default();
     let cache = Arc::new(Mutex::new(cache_map));
 
     let mut last_tick = Instant::now();
     let tick_rate = Duration::from_millis(250);
 
     loop {
-        terminal.draw(|f| ui(f, &main_updates, &info_messages, &mut list_state))?;
+        terminal.draw(|f| ui(f, &mut app))?;
 
-        let timeout = tick_rate.checked_sub(last_tick.elapsed()).unwrap_or_else(|| Duration::from_secs(0));
+        let timeout = tick_rate
+            .checked_sub(last_tick.elapsed())
+            .unwrap_or_else(|| Duration::from_secs(0));
 
         if crossterm::event::poll(timeout)? {
             if let Event::Key(key) = event::read()? {
-                match key.code {
-                    KeyCode::Char('q') => return Ok(()),
-                    KeyCode::Char('u') => {
-                        // Mark all existing articles as old
-                        for item in main_updates.iter_mut() {
-                            item.2 = false;
+                match app.input_mode {
+                    InputMode::Normal => match key.code {
+                        KeyCode::Char('q') => return Ok(()),
+                        KeyCode::Char('/') => {
+                            app.input_mode = InputMode::Search;
                         }
-                        main_updates.push(("Checking for updates...".to_string(), None, false));
-                        list_state.select(Some(main_updates.len().saturating_sub(1)));
-                        
-                        if let Some(feeds) = config.feeds.clone() {
-                            for feed in feeds {
-                                let tx_clone = tx.clone();
-                                tokio::spawn(fetch_feed(feed, tx_clone));
+                        KeyCode::Char('j') => {
+                            let filtered_count = app
+                                .all_updates
+                                .iter()
+                                .filter(|(text, _, _)| {
+                                    text.to_lowercase().contains(&app.input.to_lowercase())
+                                })
+                                .count();
+                            app.next(filtered_count);
+                        }
+                        KeyCode::Char('k') => {
+                            let filtered_count = app
+                                .all_updates
+                                .iter()
+                                .filter(|(text, _, _)| {
+                                    text.to_lowercase().contains(&app.input.to_lowercase())
+                                })
+                                .count();
+                            app.previous(filtered_count);
+                        }
+                        KeyCode::Char('u') => {
+                            for item in app.all_updates.iter_mut() {
+                                item.2 = false;
+                            }
+                            app.all_updates.push((
+                                "Checking for updates...".to_string(),
+                                None,
+                                false,
+                            ));
+                            app.list_state
+                                .select(Some(app.all_updates.len().saturating_sub(1)));
+
+                            if let Some(feeds) = config.feeds.clone() {
+                                for feed in feeds {
+                                    let tx_clone = tx.clone();
+                                    tokio::spawn(fetch_feed(feed, tx_clone));
+                                }
+                            }
+                            if let Some(manual_sites) = config.manual.clone() {
+                                for site in manual_sites {
+                                    let tx_clone = tx.clone();
+                                    let cache_clone = cache.clone();
+                                    let cache_path_clone = cache_path.clone();
+                                    tokio::spawn(check_manual_site(
+                                        site,
+                                        tx_clone,
+                                        cache_clone,
+                                        cache_path_clone,
+                                    ));
+                                }
                             }
                         }
-                        if let Some(manual_sites) = config.manual.clone() {
-                            for site in manual_sites {
-                                let tx_clone = tx.clone();
-                                let cache_clone = cache.clone();
-                                let cache_path_clone = cache_path.clone();
-                                tokio::spawn(check_manual_site(site, tx_clone, cache_clone, cache_path_clone));
-                            }
-                        }
-                    },
-                    KeyCode::Char('o') | KeyCode::Enter => {
-                        if let Some(selected_index) = list_state.selected() {
-                            if let Some((_, Some(link), _)) = main_updates.get(selected_index) {
-                                if !link.is_empty() {
-                                    match open::that(link) {
-                                        Ok(_) => { let _ = tx.try_send(Update::Info(format!("Opened {}", link))); },
-                                        Err(e) => { let _ = tx.try_send(Update::Error(format!("Failed to open link: {}", e))); }
+                        KeyCode::Char('o') | KeyCode::Enter => {
+                            if let Some(selected_index) = app.list_state.selected() {
+                                let filtered_updates: Vec<_> = app
+                                    .all_updates
+                                    .iter()
+                                    .filter(|(text, _, _)| {
+                                        text.to_lowercase().contains(&app.input.to_lowercase())
+                                    })
+                                    .collect();
+
+                                if let Some((_, Some(link), _)) =
+                                    filtered_updates.get(selected_index)
+                                {
+                                    if !link.is_empty() {
+                                        match open::that(link) {
+                                            Ok(_) => {
+                                                let _ = tx.try_send(Update::Info(format!(
+                                                    "Opened {}",
+                                                    link
+                                                )));
+                                            }
+                                            Err(e) => {
+                                                let _ = tx.try_send(Update::Error(format!(
+                                                    "Failed to open link: {}",
+                                                    e
+                                                )));
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    KeyCode::Char('j') => {
-                        let i = match list_state.selected() {
-                            Some(i) => if i >= main_updates.len() - 1 { 0 } else { i + 1 },
-                            None => 0,
-                        };
-                        list_state.select(Some(i));
-                    }
-                    KeyCode::Char('k') => {
-                        let i = match list_state.selected() {
-                            Some(i) => if i == 0 { main_updates.len() - 1 } else { i - 1 },
-                            None => 0,
-                        };
-                        list_state.select(Some(i));
-                    }
-                    _ => {}
+                        _ => {}
+                    },
+                    InputMode::Search => match key.code {
+                        KeyCode::Enter => {
+                            app.input_mode = InputMode::Normal;
+                        }
+                        KeyCode::Char(c) => {
+                            app.input.push(c);
+                        }
+                        KeyCode::Backspace => {
+                            app.input.pop();
+                        }
+                        KeyCode::Esc => {
+                            app.input_mode = InputMode::Normal;
+                            app.input.clear();
+                        }
+                        _ => {}
+                    },
                 }
             }
         }
@@ -256,25 +433,31 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
             match update {
                 Update::NewFeedItem(blog_name, title, link) => {
                     let new_link = Some(link);
-                    let is_duplicate = main_updates.iter().any(|(_, l, _)| l == &new_link);
+                    let is_duplicate = app.all_updates.iter().any(|(_, l, _)| l == &new_link);
                     if !is_duplicate {
-                        main_updates.push((format!("[FEED] {:<30} | {}", blog_name, title), new_link, true));
+                        app.all_updates.push((
+                            format!("[FEED] {:<30} | {}", blog_name, title),
+                            new_link,
+                            true,
+                        ));
                     }
                 }
                 Update::ManualUpdate(message, link) => {
-                     let new_link = Some(link);
-                    let is_duplicate = main_updates.iter().any(|(_, l, _)| l == &new_link);
+                    let new_link = Some(link);
+                    let is_duplicate = app.all_updates.iter().any(|(_, l, _)| l == &new_link);
                     if !is_duplicate {
-                        main_updates.push((format!("[MANUAL] {}", message), new_link, true));
+                        app.all_updates
+                            .push((format!("[MANUAL] {}", message), new_link, true));
                     }
                 }
                 Update::Error(e) => {
-                    main_updates.push((format!("[ERROR] {}", e), None, false));
+                    app.all_updates
+                        .push((format!("[ERROR] {}", e), None, false));
                 }
                 Update::Info(msg) => {
-                    info_messages.push(format!("[INFO] {}", msg));
-                    if info_messages.len() > 5 {
-                        info_messages.remove(0);
+                    app.info_messages.push(format!("[INFO] {}", msg));
+                    if app.info_messages.len() > 5 {
+                        app.info_messages.remove(0);
                     }
                 }
             }
@@ -286,18 +469,39 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
     }
 }
 
-fn ui(f: &mut Frame, updates: &[(String, Option<String>, bool)], info: &[String], state: &mut ListState) {
+fn ui(f: &mut Frame, app: &mut App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
-        .constraints([Constraint::Min(0), Constraint::Length(7)].as_ref())
+        .constraints(
+            [
+                Constraint::Min(0),    // Main list
+                Constraint::Length(3), // NEW: Search bar
+                Constraint::Length(7), // Info box
+            ]
+            .as_ref(),
+        )
         .split(f.size());
+
+    // Filter the items to be displayed
+    let updates: Vec<_> = app
+        .all_updates
+        .iter()
+        .filter(|(text, _, _)| text.to_lowercase().contains(&app.input.to_lowercase()))
+        .collect();
+
+    // Clamp list_state selection to avoid out-of-bounds on filtering
+    if let Some(selected) = app.list_state.selected() {
+        if selected >= updates.len() {
+            app.list_state.select(Some(updates.len().saturating_sub(1)));
+        }
+    }
 
     let items: Vec<ListItem> = updates
         .iter()
         .map(|(text, _, is_new)| {
             let is_article = text.starts_with("[FEED]") || text.starts_with("[MANUAL]");
-            
+
             let base_color = if text.starts_with("[FEED]") {
                 Color::Cyan
             } else if text.starts_with("[MANUAL]") {
@@ -331,12 +535,35 @@ fn ui(f: &mut Frame, updates: &[(String, Option<String>, bool)], info: &[String]
                 .title("Blog Updates")
                 .border_style(Style::default().fg(Color::White)),
         )
-        .highlight_style(Style::default().bg(Color::DarkGray).add_modifier(Modifier::BOLD))
+        .highlight_style(
+            Style::default()
+                .bg(Color::DarkGray)
+                .add_modifier(Modifier::BOLD),
+        )
         .highlight_symbol(">> ");
 
-    f.render_stateful_widget(list, chunks[0], state);
+    f.render_stateful_widget(list, chunks[0], &mut app.list_state);
 
-    let info_items: Vec<ListItem> = info
+    // NEW: Create and render the search bar widget
+    let search_bar = Paragraph::new(app.input.as_str())
+        .style(match app.input_mode {
+            InputMode::Normal => Style::default().fg(Color::White),
+            InputMode::Search => Style::default().fg(Color::Yellow),
+        })
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Search (Press '/' to edit, 'Esc' to exit)"),
+        );
+    f.render_widget(search_bar, chunks[1]);
+
+    // NEW: Set cursor position when in Search mode
+    if let InputMode::Search = app.input_mode {
+        f.set_cursor(chunks[1].x + app.input.len() as u16 + 1, chunks[1].y + 1)
+    }
+
+    let info_items: Vec<ListItem> = app
+        .info_messages
         .iter()
         .map(|msg| ListItem::new(msg.clone()).style(Style::default().fg(Color::Green)))
         .collect();
@@ -348,6 +575,5 @@ fn ui(f: &mut Frame, updates: &[(String, Option<String>, bool)], info: &[String]
             .border_style(Style::default().fg(Color::Green)),
     );
 
-    f.render_widget(info_list, chunks[1]);
+    f.render_widget(info_list, chunks[2]);
 }
-
