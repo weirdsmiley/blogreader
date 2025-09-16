@@ -190,6 +190,22 @@ impl App {
         }
     }
 
+    fn first(&mut self, item_count: usize) {
+        if item_count == 0 {
+            self.list_state.select(None);
+            return;
+        }
+        self.list_state.select(Some(0));
+    }
+
+    fn last(&mut self, item_count: usize) {
+        if item_count == 0 {
+            self.list_state.select(None);
+            return;
+        }
+        self.list_state.select(Some(item_count - 1));
+    }
+
     fn next(&mut self, item_count: usize) {
         if item_count == 0 {
             self.list_state.select(None);
@@ -223,6 +239,7 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
         ("Press 'o' or Enter to open selected link.".to_string(), None, None, false),
         ("Press '/' to search/filter.".to_string(), None, None, false),
         ("Use j/k to scroll.".to_string(), None, None, false),
+        ("Press g or G to go to first or last item.".to_string(), None, None, false),
         ("Press 'q' to quit.".to_string(), None, None, false),
     ];
 
@@ -261,6 +278,14 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                         KeyCode::Char('q') => return Ok(()),
                         KeyCode::Char('/') => {
                             app.input_mode = InputMode::Search;
+                        },
+                        KeyCode::Char('g') => {
+                             let filtered_count = app.all_updates.iter().filter(|(text, ..)| text.to_lowercase().contains(&app.input.to_lowercase())).count();
+                             app.first(filtered_count);
+                        },
+                        KeyCode::Char('G') => {
+                             let filtered_count = app.all_updates.iter().filter(|(text, ..)| text.to_lowercase().contains(&app.input.to_lowercase())).count();
+                             app.last(filtered_count);
                         },
                         KeyCode::Char('j') => {
                              let filtered_count = app.all_updates.iter().filter(|(text, ..)| text.to_lowercase().contains(&app.input.to_lowercase())).count();
