@@ -3,7 +3,6 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-// MODIFIED: Add chrono for date formatting
 use chrono::{DateTime, Utc};
 use ratatui::{
     backend::{Backend, CrosstermBackend},
@@ -24,7 +23,6 @@ use std::{
 use tokio::sync::mpsc;
 use feed_rs::parser as feed_parser;
 
-// UNCHANGED: Feed, Manual, Config structs
 #[derive(Debug, Deserialize, Clone)]
 struct Feed {
     name: String,
@@ -43,7 +41,6 @@ struct Config {
     manual: Option<Vec<Manual>>,
 }
 
-// MODIFIED: Update enum to include post date
 #[derive(Debug)]
 enum Update {
     NewFeedItem(String, String, String, Option<DateTime<Utc>>), // blog name, title, link, date
@@ -54,7 +51,6 @@ enum Update {
 
 type Cache = Arc<Mutex<HashMap<String, String>>>;
 
-// MODIFIED: fetch_feed now extracts the post date
 async fn fetch_feed(feed: Feed, tx: mpsc::Sender<Update>) {
     let response = match reqwest::get(&feed.url).await {
         Ok(res) => res,
@@ -95,7 +91,6 @@ async fn fetch_feed(feed: Feed, tx: mpsc::Sender<Update>) {
     }
 }
 
-// UNCHANGED: check_manual_site, main
 async fn check_manual_site(site: Manual, tx: mpsc::Sender<Update>, cache: Cache, cache_path: String) {
     let content = match reqwest::get(&site.url).await {
         Ok(res) => match res.text().await {
@@ -106,7 +101,7 @@ async fn check_manual_site(site: Manual, tx: mpsc::Sender<Update>, cache: Cache,
             }
         },
         Err(e) => {
-            let _ = tx.send(Update::Error(format!("Error fetching {}: {}", site.name, e))).await;
+            let _ = tx.send(Update::Error(format!("[Error] fetching {}: {}", site.name, e))).await;
             return;
         }
     };
@@ -170,7 +165,6 @@ enum InputMode {
     Search,
 }
 
-// MODIFIED: App state now stores the formatted date string for each item
 struct App {
     all_updates: Vec<(String, Option<String>, Option<String>, bool)>, // display_text, link, date_string, is_new
     info_messages: Vec<String>,
@@ -233,7 +227,6 @@ impl App {
 
 
 async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
-    // MODIFIED: Initial updates tuple structure changed
     let initial_updates: Vec<(String, Option<String>, Option<String>, bool)> = vec![
         ("Press 'u' to check for updates.".to_string(), None, None, false),
         ("Press 'o' or Enter to open selected link.".to_string(), None, None, false),
@@ -357,7 +350,6 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
 
         if let Ok(update) = rx.try_recv() {
             match update {
-                // MODIFIED: Handle the new date field from the update
                 Update::NewFeedItem(blog_name, title, link, date) => {
                     let new_link = Some(link);
                     let is_duplicate = app.all_updates.iter().any(|(_, l, ..)| l == &new_link);
@@ -367,9 +359,9 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                         
                         // Create the final display text including the date
                         let display_text = if let Some(d) = &date_str {
-                            format!("[FEED] {} | {:<20} | {}", d, blog_name, title)
+                            format!("[FEED] {:>10} | {:<20} | {}", d, blog_name, title)
                         } else {
-                            format!("[FEED] {:<32} | {}", blog_name, title)
+                            format!("[FEED] {:>10} | {:<20} | {}", " ".repeat(10), blog_name, title)
                         };
                         
                         app.all_updates.push((display_text, new_link, date_str, true));
@@ -401,7 +393,6 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
 }
 
 
-// MODIFIED: UI function now correctly unpacks the updated tuple
 fn ui(f: &mut Frame, app: &mut App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
