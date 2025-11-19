@@ -131,8 +131,456 @@ url  = "https://lwn.net/headlines/rss"
 name = "Jules Jacob"
 url  = "https://julesjacobs.com/feed.xml"
 
+[[feeds]]
+name = "Lawrence C Paulson"
+url  = "https://lawrencecpaulson.github.io/feed.xml"
+
+[[feeds]]
+name = "Giles' blog"
+url  = "https://www.gilesthomas.com/feed/rss.xml"
+
+[[feeds]]
+name = "PapersYouMightLove"
+url  = "https://newsletter.papersyoumightlove.pl/archive/introducing-pl-papers-you-might-love/rss.xml"
+
+[[feeds]]
+name = "Drew DeVault"
+url  = "https://drewdevault.com/blog/index.xml"
+
+[[feeds]]
+name = "smallcultfollowing"
+url  = "https://smallcultfollowing.com/babysteps/atom.xml"
+
+[[feeds]]
+name = "arrdem"
+url  = "https://arrdem.com/feeds/all.xml"
+
+[[feeds]]
+name = "borretti.me"
+url  = "https://borretti.me/feed.xml"
+
+[[feeds]]
+name = "jyn"
+url  = "https://jyn.dev/atom.xml"
+
+[[feeds]]
+name = "Mukul Rathi"
+url  = "https://mukulrathi.com/rss.xml"
+
+[[feeds]]
+name = "Malvin Gattinger"
+url  = "https://malv.in/feed.xml"
+
+[[feeds]]
+name = "William Moses"
+url  = "https://wsmoses.com/atom.xml"
+
+[[feeds]]
+name = "Trail of Bits"
+url  = "https://blog.trailofbits.com/index.xml"
+
+[[feeds]]
+name = "Alex Bradbury"
+url  = "https://muxup.com/feed.xml"
+
+[[feeds]]
+name = "Min-Yih Hsu"
+url  = "https://medium.com/feed/@mshockwave"
+
+[[feeds]]
+name = "Cantor's Paradise"
+url  = "https://www.cantorsparadise.com/feed"
+
+[[feeds]]
+name = "The Go Blog"
+url  = "https://go.dev/blog/feed.atom"
+
+[[feeds]]
+name = "Brandon Holt"
+url  = "https://bholt.org/rss.xml"
+
+[[feeds]]
+name = "Terence Tao"
+url  = "https://terrytao.wordpress.com/feed"
+
+[[feeds]]
+name = "s-risks.org"
+url  = "https://s-risks.org/feed"
+
+[[feeds]]
+name = "Alyssa Rosenzweig"
+url  = "https://rosenzweig.io/feed.xml"
+
+[[feeds]]
+name = "Thorsten Ball"
+url  = "https://thorstenball.com/atom.xml"
+
+[[feeds]]
+name = "johnnysswlab.com"
+url  = "https://johnnysswlab.com/feed"
+
+[[feeds]]
+name = "Edward Z. Yang"
+url  = "http://blog.ezyang.com/feed/atom"
+
+[[feeds]]
+name = "Daniel B Rice"
+url  = "https://www.danielbrice.net/feed.xml"
+
+[[feeds]]
+name = "tratt.net"
+url  = "https://tratt.net/laurie/news.rss"
+
+[[feeds]]
+name = "Siddharth Bhat"
+url  = "https://pixel-druid.com/feed.rss"
+
+[[feeds]]
+name = "Stefanos Baziotis"
+url  = "https://baziotis.cs.illinois.edu/rss.xml"
+
+[[feeds]]
+name = "Christopher Wellons"
+url  = "https://nullprogram.com/feed"
+
+[[feeds]]
+name = "Not a Monad"
+url  = "https://www.notamonadtutorial.com/feed"
+
+[[feeds]]
+name = "Daniel Lemire"
+url  = "https://lemire.me/blog/feed"
+
+[[feeds]]
+name = "mahesh's blog"
+url  = "https://maheshba.bitbucket.io/blog/feed.xml"
+
+[[feeds]]
+name = "David Christiansen"
+url  = "https://davidchristiansen.dk/feeds/all.atom.xml"
+
+[[feeds]]
+name = "extrema.is"
+url  = "https://www.extrema.is/blog.rss"
+
+[[feeds]]
+name = "Ian Lance Taylor"
+url  = "https://www.airs.com/blog/feed"
+
+[[feeds]]
+name = "Lewis Baker"
+url  = "https://lewissbaker.github.io/feed.xml"
+
+[[feeds]]
+name = "reductor.dev"
+url  = "https://reductor.dev/feed.xml"
+
+[[feeds]]
+name = "Gankra's Blog"
+url  = "https://faultlore.com/blah/rss.xml"
+
+# [[feeds]]
+# name = "blog.waffles.space"
+# url  = "https://blog.waffles.space/"
+
+[[feeds]]
+name = "Raph Koster"
+url  = "https://www.raphkoster.com/feed"
+
+[[feeds]]
+name = "Graydon Hoare"
+url  = "https://graydon2.dreamwidth.org/data/atom"
+
+[[feeds]]
+name = "Matt Godbolt's blog"
+url  = "https://xania.org/feed.atom"
+
+[[feeds]]
+name = "Scott Aaronson"
+url  = "https://scottaaronson.blog/?feed=rss2"
+
+[[feeds]]
+name = "graic.net"
+url  = "https://graic.net/rss.xml"
+
+[[feeds]]
+name = "Andrew Kelley"
+url  = "https://andrewkelley.me/rss.xml"
+
+[[feeds]]
+name = "Mitchell Hashimoto"
+url  = "https://mitchellh.com/feed.xml"
+
+[[feeds]]
+name = "mcyoung"
+url  = "https://mcyoung.xyz/atom.xml"
+
+[[feeds]]
+name = "Schneier on Security"
+url  = "https://www.schneier.com/feed/atom/"
+
+[[feeds]]
+name = "Shuah Khan"
+url  = "https://www.shuahkhan.com/rss"
+
+[[feeds]]
+name = "Nicholas Nethercote"
+url  = "https://nnethercote.github.io/feed.xml"
+
+[[feeds]]
+name = "Well-Typed Blog"
+url  = "https://well-typed.com/blog/rss2.xml"
+
+[[feeds]]
+name = "Haskell Blog"
+url  = "https://blog.haskell.org/atom.xml"
+
+[[feeds]]
+name = "Rust Blog"
+url  = "https://blog.rust-lang.org/feed.xml"
+
+[[feeds]]
+name = "Aaron Turon"
+url  = "https://aturon.github.io/atom.xml"
+
+[[feeds]]
+name = "people.kernel.org"
+url  = "https://people.kernel.org/read/feed/"
+
+[[feeds]]
+name = "LowLevelBits"
+url  = "https://lowlevelbits.org/atom.xml"
+
+[[feeds]]
+name = "SwiftLee"
+url  = "https://www.avanderlee.com/feed/"
+
+[[feeds]]
+name = "The n-Category Café"
+url  = "https://golem.ph.utexas.edu/category/atom10.xml"
+
+[[feeds]]
+name = "Brian Kihoon Lee"
+url  = "https://www.moderndescartes.com/essays/rss.xml"
+
+[[feeds]]
+name = "Nick Fitzgerald"
+url  = "https://fitzgen.com/feed.xml"
+
+[[feeds]]
+name = "Paul E. McKenney"
+url  = "https://paulmck.livejournal.com/data/atom"
+
+[[feeds]]
+name = "John Carlos Baez"
+url  = "https://johncarlosbaez.wordpress.com/feed"
+
+[[feeds]]
+name = "Dan Marsden"
+url  = "https://stringdiagram.com/feed"
+
+[[feeds]]
+name = "Benjamin Bumpus"
+url  = "https://bmbumpus.com/feed"
+
+[[feeds]]
+name = "Nicolas Ford"
+url  = "https://nicf.net/feed.xml"
+
+[[feeds]]
+name = "Xena"
+url  = "https://xenaproject.wordpress.com/feed"
+
+[[feeds]]
+name = "David Deutsch"
+url  = "https://www.daviddeutsch.org.uk/feed/"
+
+[[feeds]]
+name = "Philip Zucker"
+url  = "https://www.philipzucker.com/feed.xml"
+
+[[feeds]]
+name = "Google Research"
+url  = "https://research.google/blog/rss/"
+
+[[feeds]]
+name = "Max Bernstein"
+url  = "https://bernsteinbear.com/feed.xml"
+
+[[feeds]]
+name = "Adrian Sampson"
+url  = "https://www.cs.cornell.edu/~asampson/blog.xml"
+
+[[feeds]]
+name = "Pile of Hacks"
+url  = "https://pileofhacks.dev/post/index.xml"
+
+[[feeds]]
+name = "Isosceles Blog"
+url  = "https://blog.isosceles.com/rss"
+
+[[feeds]]
+name = "Maíra Canal"
+url  = "https://mairacanal.github.io/atom.xml"
+
+[[feeds]]
+name = "The Aperiodical"
+url  = "https://aperiodical.com/carnival-of-mathematics/feed/atom"
+
+[[feeds]]
+name = "Jeremy Kun"
+url  = "https://www.jeremykun.com/index.xml"
+
+[[feeds]]
+name = "Sandor Dargo"
+url  = "https://www.sandordargo.com/feed.xml"
+
+[[feeds]]
+name = "cookieplmonster"
+url  = "https://cookieplmonster.github.io/feed.xml"
+
+[[feeds]]
+name = "matklad"
+url  = "https://matklad.github.io/feed.xml"
+
+[[feeds]]
+name = "Nathan Chancellor"
+url  = "https://nathanchance.dev/posts/index.xml"
+
+[[feeds]]
+name = "Brendan Gregg's Blog"
+url  = "https://www.brendangregg.com/blog/rss.xml"
+
 # List of websites to track manually for changes.
 # These might have feeds, but are good examples for manual tracking.
 [[manual]]
 name = "Hacker News"
 url  = "https://news.ycombinator.com"
+
+[[manual]]
+name = "Stratechery by Ben Thompson"
+url  = "https://stratechery.com"
+
+[[manual]]
+name = "Joe Armstrong"
+url  = "https://joearms.github.io/#Index"
+
+[[manual]]
+name = "pl enthusiast"
+url  = "http://www.pl-enthusiast.net"
+
+[[manual]]
+name = "Chris Siebenmann"
+url  = "https://utcc.utoronto.ca/~cks/space/blog/"
+
+[[manual]]
+name = "grugbrain.dev"
+url  = "https://grugbrain.dev/"
+
+[[manual]]
+name = "Prabhakar Ragde"
+url  = "https://cs.uwaterloo.ca/~plragde/flaneries/"
+
+[[manual]]
+name = "Chris Cummins"
+url  = "https://chriscummins.cc/"
+
+[[manual]]
+name = "Tyler Mandry"
+url  = "https://tmandry.gitlab.io/blog/"
+
+[[manual]]
+name = "Hacking Articles"
+url  = "https://www.hackingarticles.in/"
+
+[[manual]]
+name = "Haskell for all"
+url  = "https://www.haskellforall.com/"
+
+[[manual]]
+name = "Aswath Damodaran"
+url  = "https://aswathdamodaran.blogspot.com/"
+
+[[manual]]
+name = "Stephen Wolfram"
+url  = "https://writings.stephenwolfram.com/"
+
+[[manual]]
+name = " Philip Wadler"
+url  = "https://wadler.blogspot.com/"
+
+[[manual]]
+name = "Semantic Domain"
+url  = "https://semantic-domain.blogspot.com/"
+
+[[manual]]
+name = "Arm Community Blogs"
+url  = "https://community.arm.com/arm-community-blogs/"
+
+[[manual]]
+name = "augustss"
+url  = "http://augustss.blogspot.com/"
+
+[[manual]]
+name = "mustythoughts.com"
+url  = "https://www.mustythoughts.com/"
+
+[[manual]]
+name = "MIT Technology Review"
+url  = "https://www.technologyreview.com/"
+
+[[manual]]
+name = "Evan Boehs"
+url  = "https://boehs.org/in/blog"
+
+[[manual]]
+name = "Kartik Singhal"
+url  = "https://ks.cs.uchicago.edu/post/"
+
+[[manual]]
+name = "Google Security"
+url  = "https://security.googleblog.com/"
+
+[[manual]]
+name = "Andrea Righi"
+url  = "https://arighi.blogspot.com/"
+
+[[manual]]
+name = "Sinon's Blog"
+url  = "https://blog.vortan.dev/"
+
+[[manual]]
+name = "Chris Lattner"
+url  = "https://nondot.org/sabre/Resume.html#writing"
+
+[[manual]]
+name = "Will Crichton"
+url  = "https://willcrichton.net/notes/"
+
+[[manual]]
+name = "Will's Root"
+url  = "https://www.willsroot.io/"
+
+[[manual]]
+name = "SYST3M FAILURE"
+url  = "https://syst3mfailure.io/"
+
+[[manual]]
+name = "Monday Morning Haskell"
+url  = "https://mmhaskell.com/blog"
+
+[[manual]]
+name = "Agner's CPU Blog"
+url  = "https://www.agner.org/forum/viewforum.php?f=1"
+
+[[manual]]
+name = "CyberWire"
+url  = "https://thecyberwire.com/stories"
+
+[[manual]]
+name = "Dark Reading"
+url  = "https://www.darkreading.com/"
+
+[[manual]]
+name = "Stephen Diehl"
+url  = "https://www.stephendiehl.com/posts/"
