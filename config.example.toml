@@ -84,7 +84,7 @@ name = "lexi-lambda.github.io"
 url  = "https://lexi-lambda.github.io/feeds/all.rss.xml"
 
 [[feeds]]
-name = "marcin.juszkiewicz.com.pl"
+name = "Marcin Juszkiewicz"
 url  = "https://marcin.juszkiewicz.com.pl/feed/"
 
 [[feeds]]
