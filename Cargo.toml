@@ -1,7 +1,13 @@
 [package]
 name = "blogreader"
-version = "0.1.0"
+version = "1.0"
 edition = "2024"
+description = "rss/atom blogreader for terminals"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/weirdsmiley/blogreader"
+keywords = ["rss", "atom", "blog", "tui"]
+categories = ["command-line-utilities"]
 
 [[bin]]
 name = "br"
